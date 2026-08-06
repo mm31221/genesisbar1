@@ -1,0 +1,227 @@
+/*=========================================
+GENESISBAR 1.0
+caja.css
+=========================================*/
+
+body{
+
+    background:#f4f4f4;
+
+    font-family:Arial, Helvetica, sans-serif;
+
+}
+
+/*=========================================
+TITULOS
+=========================================*/
+
+h2{
+
+    text-align:center;
+
+    margin:25px 0;
+
+    color:#222;
+
+}
+
+h3{
+
+    margin:10px 0;
+
+}
+
+/*=========================================
+CONTENEDOR
+=========================================*/
+
+#contenedorPedidos{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:20px;
+
+    justify-content:center;
+
+    margin:20px;
+
+}
+
+/*=========================================
+TARJETA PEDIDO
+=========================================*/
+
+.tarjeta-pedido{
+
+    width:320px;
+
+    background:#ffffff;
+
+    border-radius:10px;
+
+    padding:20px;
+
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+
+    transition:.3s;
+
+}
+
+.tarjeta-pedido:hover{
+
+    transform:scale(1.02);
+
+}
+
+/*=========================================
+LINEAS
+=========================================*/
+
+.tarjeta-pedido hr{
+
+    margin:15px 0;
+
+}
+
+/*=========================================
+BOTONES
+=========================================*/
+
+.boton{
+
+    display:block;
+
+    width:100%;
+
+    text-align:center;
+
+    background:#28a745;
+
+    color:#fff;
+
+    text-decoration:none;
+
+    padding:12px;
+
+    border-radius:6px;
+
+    margin-top:15px;
+
+    font-weight:bold;
+
+    transition:.3s;
+
+}
+
+.boton:hover{
+
+    background:#218838;
+
+}
+
+/*=========================================
+TABLAS
+=========================================*/
+
+.tabla{
+
+    width:95%;
+
+    margin:auto;
+
+    border-collapse:collapse;
+
+    background:#fff;
+
+}
+
+.tabla th{
+
+    background:#222;
+
+    color:#fff;
+
+    padding:12px;
+
+}
+
+.tabla td{
+
+    padding:10px;
+
+    border-bottom:1px solid #ddd;
+
+}
+
+.tabla tr:hover{
+
+    background:#f1f1f1;
+
+}
+
+/*=========================================
+FORMULARIOS
+=========================================*/
+
+select,
+input{
+
+    width:100%;
+
+    padding:10px;
+
+    border:1px solid #ccc;
+
+    border-radius:5px;
+
+    margin-bottom:15px;
+
+    box-sizing:border-box;
+
+}
+
+/*=========================================
+TICKET
+=========================================*/
+
+.ticket{
+
+    width:320px;
+
+    margin:auto;
+
+    background:#fff;
+
+    padding:20px;
+
+    text-align:center;
+
+}
+
+.ticket hr{
+
+    margin:12px 0;
+
+}
+
+/*=========================================
+RESPONSIVE
+=========================================*/
+
+@media(max-width:768px){
+
+    .tarjeta-pedido{
+
+        width:95%;
+
+    }
+
+    .tabla{
+
+        font-size:14px;
+
+    }
+
+}
