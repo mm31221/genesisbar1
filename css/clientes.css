@@ -1,0 +1,260 @@
+.portal-filtros-categorias {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0 12px;
+    margin-bottom: 12px;
+}
+
+.portal-filtro-categoria {
+    flex: 0 0 auto;
+    border: 1px solid #d7dde3;
+    border-radius: 999px;
+    background: #fff;
+    padding: 8px 13px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.portal-filtro-categoria.activo {
+    background: #1f7a3f;
+    border-color: #1f7a3f;
+    color: #fff;
+}
+
+.portal-productos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.portal-productos-grid .producto-cliente {
+    grid-template-columns: 84px minmax(0, 1fr);
+    align-items: start;
+    min-height: 168px;
+}
+
+.producto-cliente-img {
+    display: block;
+    width: 84px;
+    height: 84px;
+    border: 1px solid #e5dccf;
+    border-radius: 8px;
+    background: #fff;
+    object-fit: cover;
+}
+
+.portal-productos-grid .producto-cliente h4 {
+    line-height: 1.2;
+}
+
+.portal-productos-grid .producto-cliente p {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+.portal-productos-grid .producto-cliente[hidden] {
+    display: none;
+}
+
+.portal-productos-grid .boton-agregar:disabled {
+    background: #a9b0b6;
+    cursor: not-allowed;
+}
+
+.portal-perfil-main,
+.clientes-admin-page {
+    width: min(100%, 1180px);
+    margin: 0 auto;
+}
+
+.portal-puntos-panel,
+.cliente-puntos-card {
+    display: grid;
+    gap: 6px;
+    border-left: 5px solid #1f7a3f;
+}
+
+.portal-puntos-panel span,
+.cliente-puntos-card span {
+    color: #5f6974;
+    font-weight: 800;
+}
+
+.portal-puntos-panel strong,
+.cliente-puntos-card strong {
+    color: #176334;
+    font-size: 30px;
+    line-height: 1;
+}
+
+.portal-puntos-resumen {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    border: 1px solid #dce8df;
+    border-radius: 8px;
+    background: #f4fbf6;
+    padding: 10px 12px;
+    margin: 12px 0;
+}
+
+.portal-puntos-resumen span {
+    color: #4f5b66;
+    font-weight: 800;
+}
+
+.portal-puntos-resumen strong {
+    color: #176334;
+    font-size: 20px;
+}
+
+.portal-puntos-resumen a {
+    margin-left: auto;
+    color: #1f7a3f;
+    font-weight: 900;
+}
+
+.portal-tabla-panel,
+.cliente-tabla-panel {
+    overflow-x: auto;
+}
+
+.tabla-cliente {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.tabla-cliente th,
+.tabla-cliente td {
+    border-bottom: 1px solid #e8edf2;
+    padding: 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.tabla-cliente th {
+    background: #f6f8fa;
+    color: #303942;
+    font-size: 13px;
+}
+
+.tabla-cliente td:last-child,
+.tabla-cliente th:last-child {
+    text-align: right;
+}
+
+.tabla-cliente small {
+    color: #66717d;
+}
+
+.puntos-positivos {
+    color: #176334;
+    font-weight: 900;
+}
+
+.puntos-negativos {
+    color: #a61b15;
+    font-weight: 900;
+}
+
+.clientes-admin-header,
+.clientes-admin-filtros {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.clientes-admin-header h2,
+.clientes-admin-header p {
+    margin: 0;
+}
+
+.clientes-admin-filtros label,
+.cliente-puntos-form label {
+    display: grid;
+    gap: 5px;
+    font-weight: 800;
+}
+
+.clientes-admin-filtros input,
+.clientes-admin-filtros select,
+.cliente-puntos-form input,
+.cliente-puntos-form select {
+    min-height: 38px;
+    border: 1px solid #cfd6dd;
+    border-radius: 7px;
+    background: #fff;
+    padding: 8px 10px;
+    font: inherit;
+}
+
+.clientes-ficha-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(220px, .7fr) minmax(260px, .8fr);
+    gap: 14px;
+    align-items: start;
+    margin-bottom: 16px;
+}
+
+.cliente-datos-lista {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+}
+
+.cliente-datos-lista div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid #eef2f6;
+    padding-bottom: 7px;
+}
+
+.cliente-datos-lista dt {
+    color: #66717d;
+    font-weight: 800;
+}
+
+.cliente-datos-lista dd {
+    margin: 0;
+    text-align: right;
+    font-weight: 800;
+}
+
+.cliente-puntos-form {
+    display: grid;
+    gap: 10px;
+}
+
+@media (max-width: 720px) {
+    .portal-productos-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .portal-productos-grid .producto-cliente {
+        grid-template-columns: 78px minmax(0, 1fr);
+    }
+
+    .producto-cliente-img {
+        width: 78px;
+        height: 78px;
+    }
+
+    .clientes-ficha-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .clientes-admin-header,
+    .clientes-admin-filtros {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
