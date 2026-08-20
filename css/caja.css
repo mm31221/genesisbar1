@@ -3,6 +3,10 @@
     margin: 0 auto;
 }
 
+.caja-page [hidden] {
+    display: none !important;
+}
+
 .caja-header,
 .caja-toolbar,
 .caja-resumen,
@@ -23,6 +27,19 @@
     padding: 10px 0;
     color: #555;
     font-size: 14px;
+}
+
+.caja-header__acciones,
+.caja-toolbar__acciones {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.caja-toolbar__acciones form {
+    margin: 0;
 }
 
 .caja-grid {
@@ -113,6 +130,10 @@
     margin-top: 14px;
 }
 
+.caja-acciones .boton:only-child {
+    grid-column: 1 / -1;
+}
+
 .boton {
     display: inline-flex;
     align-items: center;
@@ -197,6 +218,51 @@
     color: #b42318;
 }
 
+.caja-pagos-mixtos {
+    display: grid;
+    gap: 8px;
+}
+
+.caja-pago-secundario,
+.caja-form-inicio {
+    display: grid;
+    gap: 8px;
+}
+
+.caja-inicio-panel {
+    max-width: 420px;
+}
+
+.caja-cierre-resumen {
+    margin-bottom: 16px;
+}
+
+.caja-resumen-pago {
+    display: grid;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid #dde5ec;
+    border-radius: 8px;
+    background: #f8fafb;
+}
+
+.caja-resumen-pago div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.caja-resumen-pago span {
+    color: #56616d;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.caja-resumen-pago strong {
+    text-align: right;
+}
+
 .caja-metricas {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -235,6 +301,16 @@
     display: grid;
     gap: 4px;
     font-weight: 700;
+}
+
+.caja-filtros input,
+.caja-filtros select {
+    min-height: 38px;
+    border: 1px solid #cfd6dd;
+    border-radius: 6px;
+    background: #fff;
+    padding: 8px 10px;
+    font: inherit;
 }
 
 .caja-ticket {
