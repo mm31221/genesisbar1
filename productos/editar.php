@@ -1,7 +1,12 @@
 <?php
 
-require_once "../php/conexion.php";
-require_once "../includes/header.php";
+require_once "../config/config.php";
+require_once "../php/seguridad.php";
+require_once "../php/imagenes.php";
+requerir_permiso($conexion, "productos");
+
+$csrf = token_csrf();
+$mensaje = "";
 
 if (!isset($_GET["id"])) {
     header("Location: index.php");
@@ -12,6 +17,9 @@ $id = (int) $_GET["id"];
 
 // Si se envió el formulario
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (!validar_csrf($_POST["csrf_token"] ?? "")) {
+        die("La sesion vencio. Volve a intentar.");
+    }
 
     $nombre = trim($_POST["nombre"]);
     $descripcion = trim($_POST["descripcion"]);
@@ -19,35 +27,69 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stock = $_POST["stock"];
     $id_categoria = $_POST["id_categoria"];
     $activo = isset($_POST["activo"]) ? 1 : 0;
+    $error_imagen = "";
+    $imagen_nueva = imagen_producto_subida($_FILES["imagen"] ?? null, $error_imagen);
 
-    $sql = "UPDATE productos
-            SET
-                nombre=?,
-                descripcion=?,
-                precio=?,
-                stock=?,
-                activo=?,
-                id_categoria=?
-            WHERE id_producto=?";
+    if ($imagen_nueva === false) {
+        $mensaje = $error_imagen;
+    } else {
+        if ($imagen_nueva !== null) {
+            $sql = "UPDATE productos
+                    SET
+                        nombre=?,
+                        descripcion=?,
+                        imagen=?,
+                        precio=?,
+                        stock=?,
+                        activo=?,
+                        id_categoria=?
+                    WHERE id_producto=?";
 
-    $stmt = mysqli_prepare($conexion, $sql);
+            $stmt = mysqli_prepare($conexion, $sql);
 
-    mysqli_stmt_bind_param(
-        $stmt,
-        "ssdiiii",
-        $nombre,
-        $descripcion,
-        $precio,
-        $stock,
-        $activo,
-        $id_categoria,
-        $id
-    );
+            mysqli_stmt_bind_param(
+                $stmt,
+                "sssdiiii",
+                $nombre,
+                $descripcion,
+                $imagen_nueva,
+                $precio,
+                $stock,
+                $activo,
+                $id_categoria,
+                $id
+            );
+        } else {
+            $sql = "UPDATE productos
+                    SET
+                        nombre=?,
+                        descripcion=?,
+                        precio=?,
+                        stock=?,
+                        activo=?,
+                        id_categoria=?
+                    WHERE id_producto=?";
 
-    mysqli_stmt_execute($stmt);
+            $stmt = mysqli_prepare($conexion, $sql);
 
-    header("Location: index.php");
-    exit;
+            mysqli_stmt_bind_param(
+                $stmt,
+                "ssdiiii",
+                $nombre,
+                $descripcion,
+                $precio,
+                $stock,
+                $activo,
+                $id_categoria,
+                $id
+            );
+        }
+
+        mysqli_stmt_execute($stmt);
+
+        header("Location: index.php");
+        exit;
+    }
 }
 
 // Obtener datos del producto
@@ -62,6 +104,9 @@ mysqli_stmt_execute($stmt);
 $resultado = mysqli_stmt_get_result($stmt);
 
 $producto = mysqli_fetch_assoc($resultado);
+
+$extra_css = ["/genesisbar1/css/productos.css?v=2"];
+require_once "../includes/header.php";
 
 if (!$producto) {
 
@@ -82,7 +127,12 @@ $categorias = mysqli_query(
 
 <h2>✏ Editar Producto</h2>
 
-<form method="POST">
+<?php if ($mensaje !== "") { ?>
+    <div class="mensaje-formulario error"><?= htmlspecialchars($mensaje); ?></div>
+<?php } ?>
+
+<form method="POST" enctype="multipart/form-data" class="producto-form">
+<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf); ?>">
 
 <p><strong>Nombre</strong></p>
 
@@ -103,6 +153,23 @@ name="descripcion"
 rows="4"
 style="width:100%;padding:10px;"
 ><?= htmlspecialchars($producto["descripcion"]) ?></textarea>
+
+<br><br>
+
+<p><strong>Imagen actual</strong></p>
+
+<div class="producto-imagen-actual">
+    <img src="<?= htmlspecialchars(imagen_url($producto["imagen"] ?? "")); ?>" alt="<?= htmlspecialchars($producto["nombre"]); ?>">
+    <span>Subi otra imagen solo si queres reemplazarla.</span>
+</div>
+
+<input
+type="file"
+name="imagen"
+accept="image/jpeg,image/png,image/webp"
+>
+
+<small class="ayuda-campo">JPG, PNG o WebP. Maximo 3 MB.</small>
 
 <br><br>
 

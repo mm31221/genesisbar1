@@ -1,10 +1,18 @@
 <?php
 
-require_once "../php/conexion.php";
-require_once "../includes/header.php";
+require_once "../config/config.php";
+require_once "../php/seguridad.php";
+require_once "../php/imagenes.php";
+requerir_permiso($conexion, "productos");
+
+$csrf = token_csrf();
+$mensaje = "";
 
 // Si se envió el formulario
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (!validar_csrf($_POST["csrf_token"] ?? "")) {
+        die("La sesion vencio. Volve a intentar.");
+    }
 
     $nombre = trim($_POST["nombre"]);
     $descripcion = trim($_POST["descripcion"]);
@@ -12,28 +20,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stock = $_POST["stock"];
     $id_categoria = $_POST["id_categoria"];
     $activo = isset($_POST["activo"]) ? 1 : 0;
+    $error_imagen = "";
+    $imagen = imagen_producto_subida($_FILES["imagen"] ?? null, $error_imagen);
 
-    $sql = "INSERT INTO productos
-            (nombre, descripcion, precio, stock, activo, id_categoria)
-            VALUES (?, ?, ?, ?, ?, ?)";
+    if ($imagen === false) {
+        $mensaje = $error_imagen;
+    } else {
+        $sql = "INSERT INTO productos
+                (nombre, descripcion, imagen, precio, stock, activo, id_categoria)
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    $stmt = mysqli_prepare($conexion, $sql);
+        $stmt = mysqli_prepare($conexion, $sql);
 
-    mysqli_stmt_bind_param(
-        $stmt,
-        "ssdiii",
-        $nombre,
-        $descripcion,
-        $precio,
-        $stock,
-        $activo,
-        $id_categoria
-    );
+        mysqli_stmt_bind_param(
+            $stmt,
+            "sssdiii",
+            $nombre,
+            $descripcion,
+            $imagen,
+            $precio,
+            $stock,
+            $activo,
+            $id_categoria
+        );
 
-    mysqli_stmt_execute($stmt);
+        mysqli_stmt_execute($stmt);
 
-    header("Location: index.php");
-    exit;
+        header("Location: index.php");
+        exit;
+    }
 }
 
 // Cargar categorías
@@ -42,11 +57,19 @@ $categorias = mysqli_query(
     "SELECT * FROM categorias ORDER BY nombre ASC"
 );
 
+$extra_css = ["/genesisbar1/css/productos.css?v=2"];
+require_once "../includes/header.php";
+
 ?>
 
 <h2>➕ Nuevo Producto</h2>
 
-<form method="POST">
+<?php if ($mensaje !== "") { ?>
+    <div class="mensaje-formulario error"><?= htmlspecialchars($mensaje); ?></div>
+<?php } ?>
+
+<form method="POST" enctype="multipart/form-data" class="producto-form">
+    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf); ?>">
 
     <p><strong>Nombre</strong></p>
 
@@ -66,6 +89,18 @@ $categorias = mysqli_query(
         rows="4"
         style="width:100%;padding:10px;"
     ></textarea>
+
+    <br><br>
+
+    <p><strong>Imagen</strong></p>
+
+    <input
+        type="file"
+        name="imagen"
+        accept="image/jpeg,image/png,image/webp"
+    >
+
+    <small class="ayuda-campo">JPG, PNG o WebP. Maximo 3 MB.</small>
 
     <br><br>
 

@@ -1,5 +1,6 @@
 <?php
-require_once("../php/conexion.php");
+require_once("../config/config.php");
+require_once("../php/imagenes.php");
 
 header("Content-Type: application/json; charset=utf-8");
 
@@ -18,6 +19,7 @@ $sql = "SELECT
             id_producto,
             nombre,
             descripcion,
+            imagen,
             precio,
             stock,
             sector,
@@ -41,6 +43,8 @@ if ($stmt) {
             "id_producto" => (int) $fila["id_producto"],
             "nombre" => $fila["nombre"],
             "descripcion" => $fila["descripcion"] ?? "",
+            "imagen" => $fila["imagen"] ?? "",
+            "imagen_url" => imagen_url($fila["imagen"] ?? ""),
             "precio" => (float) $fila["precio"],
             "stock" => (int) ($fila["stock"] ?? 0),
             "sector" => $fila["sector"] ?? "",

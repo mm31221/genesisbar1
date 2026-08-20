@@ -1,5 +1,5 @@
 <?php
-require_once("../php/conexion.php");
+require_once("../config/config.php");
 
 header("Content-Type: application/json; charset=utf-8");
 

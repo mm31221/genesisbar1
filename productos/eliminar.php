@@ -1,13 +1,19 @@
 <?php
 
-require_once "../php/conexion.php";
+require_once "../config/config.php";
+require_once "../php/seguridad.php";
+requerir_permiso($conexion, "productos");
 
-if (!isset($_GET["id"])) {
+if (($_SERVER["REQUEST_METHOD"] ?? "GET") !== "POST") {
     header("Location: index.php");
     exit;
 }
 
-$id = (int) $_GET["id"];
+if (!validar_csrf($_POST["csrf_token"] ?? "")) {
+    die("La sesion vencio. Volve a intentar.");
+}
+
+$id = isset($_POST["id"]) ? (int) $_POST["id"] : 0;
 
 // Eliminar producto
 $sql = "DELETE FROM productos WHERE id_producto = ?";
