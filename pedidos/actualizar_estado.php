@@ -1,9 +1,20 @@
 <?php
 date_default_timezone_set("America/Argentina/Buenos_Aires");
 
-require_once("../php/conexion.php");
+require_once("../config/config.php");
+require_once("../php/seguridad.php");
+require_once("../php/pedidos_estados.php");
 
 header("Content-Type: application/json; charset=utf-8");
+
+$empleado = empleado_actual($conexion);
+$puede_gestionar_pedidos = empleado_tiene_permiso($empleado, "pedidos");
+
+if (!$puede_gestionar_pedidos) {
+    http_response_code(403);
+    echo json_encode(["ok" => false, "mensaje" => "No autorizado."], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
 function responder_estado_pedido($ok, $mensaje, $codigo_http = 200)
 {
@@ -25,21 +36,18 @@ if (!is_array($datos)) {
     $datos = $_POST;
 }
 
+if (!validar_csrf($datos["csrf_token"] ?? "")) {
+    responder_estado_pedido(false, "La sesion vencio. Actualiza la pagina.", 403);
+}
+
 $id_pedido = isset($datos["id_pedido"]) ? (int) $datos["id_pedido"] : 0;
 $estado_nuevo = trim($datos["estado"] ?? "");
-$estados_validos = ["Pendiente", "Preparando", "Listo", "Entregado"];
-$orden = [
-    "Pendiente" => 1,
-    "Preparando" => 2,
-    "Listo" => 3,
-    "Entregado" => 4
-];
 
-if ($id_pedido < 1 || !in_array($estado_nuevo, $estados_validos, true)) {
+if ($id_pedido < 1 || !in_array($estado_nuevo, pedido_estados_operativos(), true)) {
     responder_estado_pedido(false, "Datos invalidos.", 422);
 }
 
-$stmt = mysqli_prepare($conexion, "SELECT estado FROM pedidos WHERE id_pedido = ? LIMIT 1");
+$stmt = mysqli_prepare($conexion, "SELECT estado, estado_pago FROM pedidos WHERE id_pedido = ? LIMIT 1");
 
 if (!$stmt) {
     responder_estado_pedido(false, "No se pudo consultar el pedido.", 500);
@@ -55,16 +63,14 @@ if (!$pedido) {
     responder_estado_pedido(false, "Pedido inexistente.", 404);
 }
 
-if ($pedido["estado"] === "Entregado" || $pedido["estado"] === "Cobrado") {
-    responder_estado_pedido(false, "Un pedido entregado o cobrado no puede volver a estados anteriores.", 409);
+$mensaje_transicion = "";
+
+if (!pedido_transicion_valida($pedido["estado"], $estado_nuevo, $mensaje_transicion)) {
+    responder_estado_pedido(false, $mensaje_transicion, 409);
 }
 
-if (!isset($orden[$pedido["estado"]])) {
-    responder_estado_pedido(false, "Este pedido no admite cambios de estado desde Pedidos.", 409);
-}
-
-if (($orden[$estado_nuevo] ?? 0) < $orden[$pedido["estado"]]) {
-    responder_estado_pedido(false, "No se puede volver a un estado anterior.", 409);
+if ($pedido["estado"] === $estado_nuevo) {
+    responder_estado_pedido(true, "El pedido ya estaba en ese estado.");
 }
 
 if ($estado_nuevo === "Entregado") {

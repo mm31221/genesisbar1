@@ -2,7 +2,7 @@
 // GENESISBAR 1.0 - Listado de Pedidos
 //=========================================
 
-let filtroEstado = "Pendiente";
+let filtroEstado = "Todos";
 
 const monedaPedidos = new Intl.NumberFormat("es-AR", {
     style: "currency",
@@ -36,6 +36,10 @@ function mostrarMensajeListado(texto, tipo) {
     mensaje.textContent = texto;
     mensaje.className = "mensaje-pedido " + (tipo || "info");
     mensaje.hidden = texto === "";
+}
+
+function nombreClientePedido(pedido) {
+    return pedido.nombre_cliente || pedido.nombre_manual || pedido.cliente || "Cliente no identificado";
 }
 
 function destinoPedido(pedido) {
@@ -84,12 +88,65 @@ function datosPorTipo(pedido) {
     return datos.join("<br>");
 }
 
+function textoTipoReserva(pedido) {
+    if (pedido.tipo_reserva === "Mesa") {
+        return "Reserva de mesa";
+    }
+
+    if (pedido.tipo_reserva === "Pedido") {
+        return "Pedido programado";
+    }
+
+    return "";
+}
+
 function pagoPedido(pedido) {
     if (pedido.tipo_pedido === "Mesa" || !pedido.forma_pago) {
         return "";
     }
 
     return `<span class="pago-pedido">Pago: ${escaparPedido(pedido.forma_pago)}</span>`;
+}
+
+function textoTiempoPedido(minutos) {
+    minutos = Number(minutos) || 0;
+
+    if (minutos < 1) {
+        return "Hace menos de 1 minuto";
+    }
+
+    if (minutos === 1) {
+        return "Hace 1 minuto";
+    }
+
+    if (minutos < 60) {
+        return "Hace " + minutos + " minutos";
+    }
+
+    const horas = Math.floor(minutos / 60);
+    const resto = minutos % 60;
+
+    if (resto === 0) {
+        return "Hace " + horas + (horas === 1 ? " hora" : " horas");
+    }
+
+    return "Hace " + horas + (horas === 1 ? " hora" : " horas") + " y " + resto + " min";
+}
+
+function resumenProductosPedido(pedido) {
+    if (!pedido.productos || pedido.productos.length === 0) {
+        return "";
+    }
+
+    const visibles = pedido.productos.slice(0, 3).map(function (producto) {
+        return producto.cantidad + " x " + producto.nombre;
+    });
+
+    if (pedido.productos.length > 3) {
+        visibles.push("+" + (pedido.productos.length - 3) + " mas");
+    }
+
+    return visibles.join(", ");
 }
 
 function productosPedido(pedido) {
@@ -106,11 +163,13 @@ function productosPedido(pedido) {
 }
 
 function opcionesEstado(pedido) {
-    const estados = ["Pendiente", "Preparando", "Listo", "Entregado"];
-    const entregado = pedido.estado === "Entregado";
+    const estados = Array.isArray(pedido.estados_permitidos) && pedido.estados_permitidos.length > 0
+        ? pedido.estados_permitidos
+        : [pedido.estado];
+    const estadoCerrado = estados.length <= 1 && !pedido.siguiente_estado;
 
-    if (entregado) {
-        return `<span class="estado entregado">Entregado</span>`;
+    if (estadoCerrado) {
+        return `<span class="estado estado-${escaparPedido(String(pedido.estado).toLowerCase())}">${escaparPedido(pedido.estado_texto || pedido.estado)}</span>`;
     }
 
     return `
@@ -122,71 +181,50 @@ function opcionesEstado(pedido) {
     `;
 }
 
-function renderPedidosNuevos(pedidos) {
-    const contenedor = document.getElementById("pedidosNuevos");
-    const nuevos = pedidos.filter(function (pedido) {
-        return pedido.estado === "Pendiente";
-    }).slice(0, 4);
+function renderPedidos(pedidos) {
+    const cuerpo = document.getElementById("pedidosGrid");
 
-    if (nuevos.length === 0) {
-        contenedor.innerHTML = "<div class='pedido-nuevo-vacio'>No hay pedidos nuevos.</div>";
+    if (pedidos.length === 0) {
+        cuerpo.innerHTML = "<div class='pedido-card'>No hay pedidos para este estado.</div>";
         return;
     }
 
-    contenedor.innerHTML = nuevos.map(function (pedido) {
-        const usuario = pedido.id_usuario
-            ? `<p><strong>Usuario:</strong> #${pedido.id_usuario}${pedido.nombre_usuario ? " - " + escaparPedido(pedido.nombre_usuario) : ""}</p>`
-            : "";
-
+    cuerpo.innerHTML = pedidos.map(function (pedido) {
+        const destino = destinoPedido(pedido);
+        const reserva = textoTipoReserva(pedido);
         return `
-            <article class="pedido-nuevo-card">
-                <h3>${escaparPedido(pedido.numero_pedido)}</h3>
-                <p><strong>Origen:</strong> ${escaparPedido(pedido.origen)}</p>
-                ${usuario}
-                <p>${datosPorTipo(pedido)}</p>
-                <ul>${productosPedido(pedido)}</ul>
+            <article class="pedido-card" tabindex="0" data-url="ver.php?id=${pedido.id_pedido}">
+                <div class="pedido-card__top">
+                    <h3>${escaparPedido(pedido.numero_pedido)}</h3>
+                    <span class="estado estado-${escaparPedido(String(pedido.estado).toLowerCase())}">${escaparPedido(pedido.estado)}</span>
+                </div>
+                <p><strong>Cliente:</strong> ${escaparPedido(nombreClientePedido(pedido))}</p>
+                <p><strong>Tipo:</strong> ${escaparPedido(pedido.tipo_pedido)}</p>
+                ${reserva ? `<p><strong>Reserva:</strong> ${escaparPedido(reserva)}</p>` : ""}
+                <p><strong>Destino:</strong> ${escaparPedido(destino || "-")}</p>
+                <p><strong>Hora:</strong> ${escaparPedido(pedido.hora)}</p>
+                ${pedido.horario_entrega_texto ? `<p class="horario-entrega"><strong>Entrega:</strong> ${escaparPedido(pedido.horario_entrega_texto)}</p>` : ""}
+                <p><strong>Tiempo:</strong> ${escaparPedido(textoTiempoPedido(pedido.minutos_transcurridos))}</p>
+                ${resumenProductosPedido(pedido) ? `<p><strong>Comanda:</strong> ${escaparPedido(resumenProductosPedido(pedido))}</p>` : ""}
                 ${pedido.observaciones ? `<p><strong>Obs:</strong> ${escaparPedido(pedido.observaciones)}</p>` : ""}
+                <p><strong>Pago:</strong> ${escaparPedido(pedido.estado_pago || "Pendiente")}</p>
+                <div class="pedido-card__total">
+                    <strong>${monedaPedidos.format(pedido.total)}</strong>
+                    <div class="pedido-card__acciones">
+                        ${opcionesEstado(pedido)}
+                        <a class="btn-ver" href="ver.php?id=${pedido.id_pedido}">Ver</a>
+                    </div>
+                </div>
             </article>
         `;
     }).join("");
 }
 
-function renderTabla(pedidos) {
-    const cuerpo = document.getElementById("tablaPedidosBody");
-
-    if (pedidos.length === 0) {
-        cuerpo.innerHTML = "<tr><td colspan='7'>No hay pedidos para este estado.</td></tr>";
-        return;
-    }
-
-    cuerpo.innerHTML = pedidos.map(function (pedido) {
-        return `
-            <tr>
-                <td data-label="Pedido">
-                    <strong>${escaparPedido(pedido.numero_pedido)}</strong>
-                    <small>${escaparPedido(pedido.origen)}</small>
-                </td>
-                <td data-label="Tipo">${datosPorTipo(pedido)}</td>
-                <td data-label="Destino">${escaparPedido(destinoPedido(pedido)) || "-"}</td>
-                <td data-label="Estado">${opcionesEstado(pedido)}</td>
-                <td data-label="Total">
-                    ${monedaPedidos.format(pedido.total)}
-                    ${pagoPedido(pedido)}
-                </td>
-                <td data-label="Hora">${escaparPedido(pedido.hora)}</td>
-                <td data-label="Acciones" class="acciones-tabla">
-                    <a class="btn-ver" href="ver.php?id=${pedido.id_pedido}">Ver</a>
-                </td>
-            </tr>
-        `;
-    }).join("");
-}
-
 function actualizarContadores(contadores) {
+    document.querySelector("[data-contador='Todos']").textContent = contadores.Todos || 0;
     document.querySelector("[data-contador='Pendiente']").textContent = contadores.Pendiente || 0;
     document.querySelector("[data-contador='Preparando']").textContent = contadores.Preparando || 0;
     document.querySelector("[data-contador='Listo']").textContent = contadores.Listo || 0;
-    document.querySelector("[data-contador='Entregado']").textContent = contadores.Entregado || 0;
 }
 
 function cargarPedidos() {
@@ -200,8 +238,7 @@ function cargarPedidos() {
             }
 
             actualizarContadores(datos.contadores || {});
-            renderTabla(datos.pedidos || []);
-            renderPedidosNuevos(datos.pedidos || []);
+            renderPedidos(datos.pedidos || []);
             document.getElementById("ultimaActualizacionPedidos").textContent = datos.actualizado || "--:--:--";
             mostrarMensajeListado("", "info");
         })
@@ -231,7 +268,8 @@ document.addEventListener("change", function (event) {
         },
         body: JSON.stringify({
             id_pedido: idPedido,
-            estado: estado
+            estado: estado,
+            csrf_token: document.getElementById("csrfPedidosListado").value
         })
     })
         .then(function (respuesta) { return respuesta.json(); })
@@ -247,4 +285,27 @@ document.addEventListener("change", function (event) {
             mostrarMensajeListado(error.message, "error");
             cargarPedidos();
         });
+});
+
+document.addEventListener("click", function (event) {
+    const controlInterno = event.target.closest("a, button, select, input");
+    const tarjeta = event.target.closest(".pedido-card[data-url]");
+
+    if (!tarjeta || controlInterno) {
+        return;
+    }
+
+    window.location.href = tarjeta.dataset.url;
+});
+
+document.addEventListener("keydown", function (event) {
+    if (event.key !== "Enter") {
+        return;
+    }
+
+    const tarjeta = event.target.closest(".pedido-card[data-url]");
+
+    if (tarjeta) {
+        window.location.href = tarjeta.dataset.url;
+    }
 });

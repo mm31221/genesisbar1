@@ -1,9 +1,17 @@
 <?php
 date_default_timezone_set("America/Argentina/Buenos_Aires");
 
-require_once("../php/conexion.php");
+require_once("../config/config.php");
+require_once("../php/seguridad.php");
+require_once("../php/pedidos_estados.php");
 
 header("Content-Type: application/json; charset=utf-8");
+
+if (!empleado_tiene_permiso(empleado_actual($conexion), "pedidos")) {
+    http_response_code(403);
+    echo json_encode(["ok" => false, "mensaje" => "No autorizado."], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
 function texto_numero_pedido($pedido)
 {
@@ -11,28 +19,24 @@ function texto_numero_pedido($pedido)
     return $numero !== "" ? $numero : "#" . $pedido["id_pedido"];
 }
 
-function formato_hora_pedido($fecha)
-{
-    $timestamp = strtotime($fecha);
-    return $timestamp ? date("H:i", $timestamp) : "-";
-}
-
-$estados_validos = ["Todos", "Pendiente", "Preparando", "Listo", "Entregado"];
+$estados_activos = pedido_estados_activos();
+$estados_validos = array_merge(["Todos"], $estados_activos);
 $estado = trim($_GET["estado"] ?? "Todos");
 
 if (!in_array($estado, $estados_validos, true)) {
     $estado = "Todos";
 }
 
-$contadores = [
-    "Pendiente" => 0,
-    "Preparando" => 0,
-    "Listo" => 0,
-    "Entregado" => 0,
-    "Todos" => 0
-];
+$contadores = ["Todos" => 0];
 
-$resultado_contadores = mysqli_query($conexion, "SELECT estado, COUNT(*) AS total FROM pedidos GROUP BY estado");
+foreach ($estados_activos as $estado_contador) {
+    $contadores[$estado_contador] = 0;
+}
+
+$estados_sql = "'" . implode("','", array_map(function ($item) use ($conexion) {
+    return mysqli_real_escape_string($conexion, $item);
+}, $estados_activos)) . "'";
+$resultado_contadores = mysqli_query($conexion, "SELECT estado, COUNT(*) AS total FROM pedidos WHERE estado IN ($estados_sql) GROUP BY estado");
 
 if ($resultado_contadores) {
     while ($fila = mysqli_fetch_assoc($resultado_contadores)) {
@@ -43,7 +47,19 @@ if ($resultado_contadores) {
     }
 }
 
-$where = "";
+$where = "WHERE pedidos.estado IN ($estados_sql)";
+$campo_horario_entrega = columna_existe($conexion, "pedidos", "horario_entrega")
+    ? "pedidos.horario_entrega"
+    : "NULL";
+$campo_direccion_calle = columna_existe($conexion, "pedidos", "direccion_calle")
+    ? "pedidos.direccion_calle"
+    : "NULL";
+$campo_direccion_altura = columna_existe($conexion, "pedidos", "direccion_altura")
+    ? "pedidos.direccion_altura"
+    : "NULL";
+$campo_tipo_reserva = columna_existe($conexion, "pedidos", "tipo_reserva")
+    ? "pedidos.tipo_reserva"
+    : "'Ninguna'";
 
 if ($estado !== "Todos") {
     $where = "WHERE pedidos.estado = ?";
@@ -54,13 +70,18 @@ $sql = "SELECT
         pedidos.numero_pedido,
         pedidos.origen,
         pedidos.tipo_pedido,
+        $campo_tipo_reserva AS tipo_reserva,
         pedidos.id_mesa,
         pedidos.mesa,
         pedidos.direccion_entrega,
+        $campo_direccion_calle AS direccion_calle,
+        $campo_direccion_altura AS direccion_altura,
         pedidos.estado,
+        pedidos.estado_pago,
         pedidos.total,
         pedidos.observaciones,
         pedidos.fecha_hora_inicio,
+        $campo_horario_entrega AS horario_entrega,
         clientes.id_cliente,
         clientes.nombre AS nombre_cliente,
         clientes.telefono AS telefono_cliente,
@@ -96,13 +117,23 @@ if ($stmt) {
             "numero_pedido" => texto_numero_pedido($pedido),
             "origen" => $pedido["origen"] ?: "Pagina web",
             "tipo_pedido" => $pedido["tipo_pedido"],
+            "tipo_reserva" => $pedido["tipo_reserva"] ?? "Ninguna",
             "mesa" => trim($pedido["numero_mesa"] ?? "") !== "" ? $pedido["numero_mesa"] : ($pedido["mesa"] ?? ""),
-            "direccion_entrega" => $pedido["direccion_entrega"] ?? "",
+            "direccion_calle" => $pedido["direccion_calle"] ?? "",
+            "direccion_altura" => $pedido["direccion_altura"] ?? "",
+            "direccion_entrega" => direccion_compuesta($pedido["direccion_calle"] ?? "", $pedido["direccion_altura"] ?? "", $pedido["direccion_entrega"] ?? ""),
             "estado" => $pedido["estado"],
+            "estado_pago" => $pedido["estado_pago"] ?? "Pendiente",
             "total" => (float) $pedido["total"],
             "observaciones" => $pedido["observaciones"] ?? "",
             "fecha_hora_inicio" => $pedido["fecha_hora_inicio"],
-            "hora" => formato_hora_pedido($pedido["fecha_hora_inicio"]),
+            "horario_entrega" => $pedido["horario_entrega"] ?? null,
+            "horario_entrega_texto" => !empty($pedido["horario_entrega"]) ? date("d/m H:i", strtotime($pedido["horario_entrega"])) : "",
+            "hora" => date("H:i", strtotime($pedido["fecha_hora_inicio"])),
+            "minutos_transcurridos" => pedido_minutos_transcurridos($pedido["fecha_hora_inicio"]),
+            "estado_texto" => pedido_estado_etiqueta($pedido["estado"]),
+            "estados_permitidos" => pedido_estados_permitidos_desde($pedido["estado"]),
+            "siguiente_estado" => pedido_siguiente_estado($pedido["estado"]),
             "id_cliente" => $pedido["id_cliente"] ? (int) $pedido["id_cliente"] : null,
             "nombre_cliente" => $pedido["nombre_cliente"] ?? "",
             "telefono_cliente" => $pedido["telefono_cliente"] ?? "",
