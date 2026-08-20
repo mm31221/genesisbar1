@@ -18,6 +18,16 @@ echo date("H:i:s");
 
 </footer>
 
+<?php
+if (!empty($extra_js) && is_array($extra_js)) {
+    foreach ($extra_js as $js) {
+?>
+<script src="<?= htmlspecialchars($js); ?>"></script>
+<?php
+    }
+}
+?>
+
 </body>
 
 </html>
