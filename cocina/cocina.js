@@ -86,6 +86,18 @@ function renderProductos(productos) {
     `;
 }
 
+function renderAccionCocina(pedido) {
+    if (pedido.estado === "Pendiente") {
+        return `<div class="cocina-aviso cocina-aviso-pendiente">Avisar al mozo para pasar a preparacion</div>`;
+    }
+
+    if (pedido.estado === "Preparando") {
+        return `<div class="cocina-aviso cocina-aviso-listo">Cuando este listo, avisar al mozo</div>`;
+    }
+
+    return `<div class="cocina-aviso cocina-aviso-espera">Esperando entrega por mozo</div>`;
+}
+
 function renderPedido(pedido) {
     const esNuevo = !primeraCarga && !pedidosVistos.has(pedido.id_pedido);
     pedidosVistos.add(pedido.id_pedido);
@@ -93,13 +105,19 @@ function renderPedido(pedido) {
     const observaciones = pedido.observaciones
         ? `<div class="cocina-observaciones"><strong>Obs. general</strong><p>${escaparHtml(pedido.observaciones).replace(/\n/g, "<br>")}</p></div>`
         : "";
+    const horarioEntrega = pedido.horario_entrega_texto
+        ? `<p class="cocina-entrega"><strong>Entrega:</strong> ${escaparHtml(pedido.horario_entrega_texto)}</p>`
+        : "";
     const claseDemora = claseTiempo(pedido.minutos_transcurridos);
 
     return `
-        <article class="comanda cocina-card cocina-compacta estado-${pedido.estado.toLowerCase()} ${claseDemora} ${esNuevo ? "pedido-nuevo" : ""}">
+        <article class="comanda cocina-card cocina-compacta estado-${pedido.estado.toLowerCase()} ${claseDemora} ${esNuevo ? "pedido-nuevo" : ""}" tabindex="0" data-url="/genesisbar1/pedidos/ver.php?id=${pedido.id_pedido}">
             <div class="comanda-header cocina-card-header">
                 <div>
                     <h2>${escaparHtml(pedido.numero_pedido)}</h2>
+                    <p class="cocina-destino">${escaparHtml(pedido.destino_produccion || pedido.tipo_pedido || "")}</p>
+                    <p class="cocina-meta">${escaparHtml(pedido.tipo_pedido || "")} - ${escaparHtml(pedido.hora || "-")}</p>
+                    ${horarioEntrega}
                     <span class="cocina-tiempo">${textoTiempo(pedido.minutos_transcurridos)}</span>
                 </div>
                 <span class="estado-cocina">${escaparHtml(pedido.estado_texto)}</span>
@@ -108,9 +126,33 @@ function renderPedido(pedido) {
             ${renderProductos(pedido.productos)}
 
             ${observaciones}
+
+            <div class="cocina-card-acciones">
+                ${renderAccionCocina(pedido)}
+            </div>
         </article>
     `;
 }
+
+document.addEventListener("click", function (event) {
+    const tarjeta = event.target.closest(".cocina-card[data-url]");
+
+    if (tarjeta) {
+        window.location.href = tarjeta.dataset.url;
+    }
+});
+
+document.addEventListener("keydown", function (event) {
+    if (event.key !== "Enter") {
+        return;
+    }
+
+    const tarjeta = event.target.closest(".cocina-card[data-url]");
+
+    if (tarjeta) {
+        window.location.href = tarjeta.dataset.url;
+    }
+});
 
 function actualizarContadores(contadores) {
     document.getElementById("contadorPendientes").textContent = contadores.pendientes || 0;

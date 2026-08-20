@@ -1,6 +1,14 @@
 <?php
-require_once("../php/conexion.php");
+require_once("../config/config.php");
+require_once("../php/seguridad.php");
+requerir_permiso($conexion, "cocina");
+
+$extra_css = ["/genesisbar1/css/cocina.css?v=4"];
+$extra_js = ["/genesisbar1/cocina/cocina.js?v=4"];
+$body_class = "pantalla-cocina";
+
 require_once("../includes/header.php");
+$csrf = token_csrf();
 ?>
 
 <section class="cocina-panel">
@@ -8,7 +16,7 @@ require_once("../includes/header.php");
     <div class="cocina-cabecera">
         <div>
             <h2>Panel de Cocina</h2>
-            <p>Comandas activas enfocadas en productos, cantidades y tiempos de preparacion.</p>
+            <p>Comandas activas. Avisar al mozo cuando haya que cambiar el estado.</p>
         </div>
 
         <div class="cocina-actualizacion">
@@ -40,14 +48,13 @@ require_once("../includes/header.php");
     </div>
 
     <div id="mensajeCocina" class="mensaje-pedido" role="status" aria-live="polite"></div>
+    <input type="hidden" id="csrfCocina" value="<?= htmlspecialchars($csrf); ?>">
 
     <div id="comandas" class="cocina-grid">
         <div class="cocina-vacio">Cargando pedidos...</div>
     </div>
 
 </section>
-
-<script src="/genesisbar1/cocina/cocina.js?v=1"></script>
 
 <?php
 require_once("../includes/footer.php");

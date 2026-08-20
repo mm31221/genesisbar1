@@ -1,39 +1,53 @@
 <?php
 date_default_timezone_set("America/Argentina/Buenos_Aires");
 
-require_once("../php/conexion.php");
+require_once("../config/config.php");
+require_once("../php/seguridad.php");
+require_once("../php/pedidos_estados.php");
 
 header("Content-Type: application/json; charset=utf-8");
 
-function cocina_tiene_columna($conexion, $tabla, $columna)
-{
-    $tabla = mysqli_real_escape_string($conexion, $tabla);
-    $columna = mysqli_real_escape_string($conexion, $columna);
-    $resultado = mysqli_query($conexion, "SHOW COLUMNS FROM `$tabla` LIKE '$columna'");
-
-    return $resultado && mysqli_num_rows($resultado) > 0;
+if (!empleado_tiene_permiso(empleado_actual($conexion), "cocina")) {
+    http_response_code(403);
+    echo json_encode(["ok" => false, "mensaje" => "No autorizado."], JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
-function cocina_texto_estado($estado)
-{
-    $estados = [
-        "Pendiente" => "Pendiente",
-        "Preparando" => "En preparacion",
-        "Listo" => "Listo",
-        "Entregado" => "Entregado"
-    ];
-
-    return $estados[$estado] ?? $estado;
-}
+$campo_horario_entrega = columna_existe($conexion, "pedidos", "horario_entrega")
+    ? "pedidos.horario_entrega"
+    : "NULL";
+$usa_tipo_reserva = columna_existe($conexion, "pedidos", "tipo_reserva");
+$campo_tipo_reserva = $usa_tipo_reserva ? "pedidos.tipo_reserva" : "'Ninguna'";
+$filtro_reservas = $usa_tipo_reserva
+    ? "AND (
+        pedidos.tipo_reserva = 'Ninguna'
+        OR pedidos.tipo_reserva IS NULL
+        OR pedidos.estado IN ('Preparando', 'Listo')
+        OR (
+            pedidos.tipo_reserva = 'Pedido'
+            AND (
+                pedidos.horario_entrega IS NULL
+                OR pedidos.horario_entrega <= DATE_ADD(NOW(), INTERVAL 60 MINUTE)
+            )
+        )
+    )"
+    : "";
 
 $sql_pedidos = "SELECT
         pedidos.id_pedido,
         pedidos.numero_pedido,
+        pedidos.tipo_pedido,
+        pedidos.mesa,
         pedidos.estado,
         pedidos.observaciones,
-        pedidos.fecha_hora_inicio
+        pedidos.fecha_hora_inicio,
+        $campo_horario_entrega AS horario_entrega,
+        $campo_tipo_reserva AS tipo_reserva,
+        mesas.numero AS numero_mesa
     FROM pedidos
+    LEFT JOIN mesas ON mesas.id_mesa = pedidos.id_mesa
     WHERE pedidos.estado IN ('Pendiente', 'Preparando', 'Listo')
+    $filtro_reservas
     ORDER BY pedidos.fecha_hora_inicio ASC, pedidos.id_pedido ASC";
 
 $resultado_pedidos = mysqli_query($conexion, $sql_pedidos);
@@ -48,12 +62,17 @@ if ($resultado_pedidos) {
         $pedidos[$id_pedido] = [
             "id_pedido" => $id_pedido,
             "numero_pedido" => $numero_pedido !== "" ? $numero_pedido : "#" . $id_pedido,
+            "tipo_pedido" => $pedido["tipo_pedido"],
+            "destino_produccion" => pedido_destino_produccion($pedido),
             "estado" => $pedido["estado"],
-            "estado_texto" => cocina_texto_estado($pedido["estado"]),
+            "tipo_reserva" => $pedido["tipo_reserva"] ?? "Ninguna",
+            "estado_texto" => pedido_estado_etiqueta($pedido["estado"]),
             "observaciones" => $pedido["observaciones"] ?? "",
             "fecha_hora_inicio" => $pedido["fecha_hora_inicio"],
+            "horario_entrega" => $pedido["horario_entrega"] ?? null,
+            "horario_entrega_texto" => !empty($pedido["horario_entrega"]) ? date("d/m H:i", strtotime($pedido["horario_entrega"])) : "",
             "hora" => date("H:i", strtotime($pedido["fecha_hora_inicio"])),
-            "minutos_transcurridos" => max(0, (int) floor((time() - strtotime($pedido["fecha_hora_inicio"])) / 60)),
+            "minutos_transcurridos" => pedido_minutos_transcurridos($pedido["fecha_hora_inicio"]),
             "productos" => []
         ];
 
@@ -63,7 +82,7 @@ if ($resultado_pedidos) {
 
 if (count($ids) > 0) {
     $ids_sql = implode(",", array_map("intval", $ids));
-    $campo_observaciones = cocina_tiene_columna($conexion, "detalle_pedido", "observaciones")
+    $campo_observaciones = columna_existe($conexion, "detalle_pedido", "observaciones")
         ? "detalle_pedido.observaciones"
         : "''";
 
