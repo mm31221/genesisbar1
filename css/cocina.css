@@ -1,0 +1,314 @@
+/* ===========================
+   COCINA - CARTAS DE COMANDA
+=========================== */
+
+.cocina-panel{
+    width:100%;
+}
+
+body.pantalla-cocina{
+    background:#f3f1ec;
+}
+
+body.pantalla-cocina > header,
+body.pantalla-cocina > footer{
+    display:none;
+}
+
+body.pantalla-cocina main{
+    width:100%;
+    min-height:100vh;
+    margin:0;
+    padding:12px;
+}
+
+body.pantalla-cocina .cocina-cabecera{
+    margin-bottom:12px;
+}
+
+body.pantalla-cocina .cocina-cabecera h2{
+    font-size:30px;
+}
+
+body.pantalla-cocina .cocina-cabecera p{
+    margin-bottom:0;
+}
+
+body.pantalla-cocina .cocina-contadores{
+    grid-template-columns:repeat(4,minmax(140px,1fr));
+    gap:10px;
+    margin-bottom:10px;
+}
+
+body.pantalla-cocina .contador{
+    border-radius:8px;
+    padding:14px 16px;
+}
+
+body.pantalla-cocina .contador strong{
+    font-size:38px;
+}
+
+.cocina-panel .cocina-grid,
+.cocina-panel #comandas{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:12px;
+    align-items:start;
+    margin-top:12px;
+}
+
+.cocina-panel .comanda.cocina-card{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    min-height:0;
+    padding:0;
+    overflow:hidden;
+    background:#fffdf8;
+    color:#202020;
+    border:1px solid #e5ded2;
+    border-top:7px solid #ff9800;
+    border-left:1px solid #e5ded2;
+    border-radius:8px;
+    box-shadow:0 4px 12px rgba(32,32,32,.10);
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+}
+
+.cocina-panel .comanda.cocina-card:hover,
+.cocina-panel .comanda.cocina-card:focus{
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(32,32,32,.14);
+    outline:0;
+}
+
+.cocina-panel .comanda.cocina-card.estado-pendiente{
+    border-top-color:#ff9800;
+}
+
+.cocina-panel .comanda.cocina-card.estado-preparando{
+    border-top-color:#2196f3;
+}
+
+.cocina-panel .comanda.cocina-card.estado-listo{
+    border-top-color:#4caf50;
+}
+
+.cocina-panel .comanda.cocina-card.tiempo-demorado{
+    background:#fff8e1;
+}
+
+.cocina-panel .comanda.cocina-card.tiempo-muy-demorado{
+    background:#fff0ef;
+    border-color:#efb2aa;
+    border-top-color:#d32f2f;
+}
+
+.cocina-panel .cocina-card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    margin:0;
+    padding:12px 12px 10px;
+    border-bottom:1px dashed #d8cfbf;
+    background:rgba(255,255,255,.72);
+}
+
+.cocina-panel .cocina-card-header h2{
+    margin:0;
+    font-size:18px;
+    line-height:1.05;
+    letter-spacing:0;
+}
+
+.cocina-panel .cocina-tiempo{
+    display:block;
+    margin-top:6px;
+    color:#595047;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.cocina-panel .cocina-destino{
+    margin:4px 0 0;
+    color:#4f463c;
+    font-size:15px;
+    font-weight:bold;
+}
+
+.cocina-panel .cocina-meta{
+    margin:4px 0 0;
+    color:#6d6257;
+    font-size:12px;
+    font-weight:bold;
+    text-transform:uppercase;
+}
+
+.cocina-panel .estado-cocina{
+    flex:0 0 auto;
+    max-width:128px;
+    padding:6px 10px;
+    color:white;
+    border-radius:6px;
+    font-size:12px;
+    font-weight:bold;
+    line-height:1.2;
+    text-align:center;
+}
+
+.cocina-panel .estado-pendiente .estado-cocina{
+    background:#ff9800;
+}
+
+.cocina-panel .estado-preparando .estado-cocina{
+    background:#2196f3;
+}
+
+.cocina-panel .estado-listo .estado-cocina{
+    background:#4caf50;
+}
+
+.cocina-panel .cocina-productos{
+    list-style:none;
+    margin:0;
+    padding:0 12px 4px;
+}
+
+.cocina-panel .cocina-productos li{
+    padding:9px 0;
+    border-bottom:1px solid #ebe4d8;
+}
+
+.cocina-panel .cocina-productos li:last-child{
+    border-bottom:0;
+}
+
+.cocina-panel .cocina-productos strong{
+    display:block;
+    font-size:18px;
+    line-height:1.25;
+}
+
+.cocina-panel .cocina-productos small{
+    display:block;
+    margin-top:6px;
+    padding:8px 10px;
+    color:#4f463c;
+    background:#fff3cd;
+    border-left:4px solid #ff9800;
+    border-radius:6px;
+    font-size:14px;
+    line-height:1.35;
+}
+
+.cocina-panel .cocina-observaciones{
+    margin:0 12px 12px;
+    padding:10px;
+    background:#fff3cd;
+    border:1px solid #f3d27b;
+    border-left:5px solid #ff9800;
+    border-radius:8px;
+}
+
+.cocina-panel .cocina-observaciones strong{
+    display:block;
+    margin-bottom:6px;
+}
+
+.cocina-panel .cocina-observaciones p{
+    margin:0;
+    color:#3d3327;
+    font-size:15px;
+    line-height:1.4;
+}
+
+.cocina-panel .cocina-card-acciones{
+    margin-top:auto;
+    padding:0 12px 12px;
+}
+
+.cocina-panel .cocina-accion{
+    width:100%;
+}
+
+.cocina-panel .cocina-aviso,
+.cocina-panel .cocina-accion-completada{
+    padding:9px 10px;
+    border:1px solid #d2c6b5;
+    border-radius:6px;
+    background:#fff8e8;
+    color:#58422b;
+    font-size:13px;
+    font-weight:bold;
+    text-align:center;
+}
+
+.cocina-panel .cocina-aviso-listo{
+    border-color:#a8d7b6;
+    background:#edf8f0;
+    color:#176334;
+}
+
+.cocina-panel .cocina-aviso-pendiente{
+    border-color:#ffd48a;
+    background:#fff3d5;
+    color:#875500;
+}
+
+.cocina-panel .cocina-entrega{
+    margin:6px 0 0;
+    color:#202020;
+    font-size:15px;
+    font-weight:bold;
+}
+
+.cocina-panel .pedido-nuevo{
+    animation:pedidoNuevoCarta 1.2s ease-in-out 2;
+}
+
+@keyframes pedidoNuevoCarta{
+    0%{ box-shadow:0 0 0 0 rgba(255,152,0,.72); }
+    100%{ box-shadow:0 10px 22px rgba(32,32,32,.14), 0 0 0 14px rgba(255,152,0,0); }
+}
+
+@media(max-width:768px){
+    body.pantalla-cocina main{
+        padding:8px;
+    }
+
+    body.pantalla-cocina .cocina-contadores{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+    .cocina-panel .cocina-grid,
+    .cocina-panel #comandas{
+        grid-template-columns:1fr;
+        gap:14px;
+    }
+
+    .cocina-panel .comanda.cocina-card{
+        min-height:0;
+    }
+
+    .cocina-panel .cocina-card-header{
+        padding:14px;
+    }
+
+    .cocina-panel .cocina-card-header h2{
+        font-size:20px;
+    }
+
+    .cocina-panel .cocina-productos{
+        padding:0 14px 4px;
+    }
+
+    .cocina-panel .cocina-productos strong{
+        font-size:17px;
+    }
+
+    .cocina-panel .cocina-observaciones{
+        margin:0 14px 14px;
+    }
+}

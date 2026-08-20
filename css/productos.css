@@ -1,0 +1,85 @@
+/* GenesisBar 1.0 - Productos e imagenes */
+
+.contenedor table {
+    width: 100%;
+}
+
+.producto-thumb {
+    display: block;
+    width: 58px;
+    height: 58px;
+    border: 1px solid #dfe5eb;
+    border-radius: 8px;
+    background: #f6f8fa;
+    object-fit: cover;
+}
+
+.producto-form {
+    display: grid;
+    gap: 0;
+    max-width: 720px;
+}
+
+.producto-form input[type="text"],
+.producto-form input[type="number"],
+.producto-form input[type="file"],
+.producto-form textarea,
+.producto-form select {
+    border: 1px solid #cfd6dd;
+    border-radius: 7px;
+    background: #fff;
+    font: inherit;
+}
+
+.producto-form input[type="file"] {
+    padding: 9px;
+}
+
+.ayuda-campo {
+    display: block;
+    margin-top: 6px;
+    color: #65707b;
+    font-weight: 700;
+}
+
+.mensaje-formulario {
+    max-width: 720px;
+    margin: 12px 0 16px;
+    border-radius: 8px;
+    padding: 11px 13px;
+    font-weight: 800;
+}
+
+.mensaje-formulario.error {
+    background: #fdeceb;
+    color: #a61b15;
+}
+
+.producto-imagen-actual {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    color: #65707b;
+    font-weight: 800;
+}
+
+.producto-imagen-actual img {
+    width: 86px;
+    height: 86px;
+    border: 1px solid #dfe5eb;
+    border-radius: 8px;
+    background: #f6f8fa;
+    object-fit: cover;
+}
+
+@media (max-width: 720px) {
+    .contenedor table {
+        min-width: 760px;
+    }
+
+    .producto-imagen-actual {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

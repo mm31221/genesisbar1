@@ -1,0 +1,171 @@
+.login-empleado,
+.empleados-page {
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.login-empleado {
+    display: grid;
+    gap: 16px;
+}
+
+.login-empleado__intro {
+    text-align: center;
+}
+
+.login-empleado__intro p {
+    color: #5f6b76;
+}
+
+.login-roles {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.login-rol {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    min-height: 104px;
+    border: 1px solid #dfe5eb;
+    border-radius: 8px;
+    background: #fff;
+    color: #20242a;
+    padding: 14px 10px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 800;
+    box-shadow: 0 1px 4px rgba(20, 32, 45, .05);
+}
+
+.login-rol span {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #202020;
+    color: #ff9800;
+    font-size: 14px;
+}
+
+.login-rol small {
+    color: #66717d;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.login-rol.activo,
+.login-rol:hover {
+    border-color: #1f7a3f;
+    background: #f1fbf4;
+}
+
+.login-empleado form,
+.empleado-form,
+.empleado-card {
+    display: grid;
+    gap: 10px;
+    border: 1px solid #e2e7ec;
+    border-radius: 8px;
+    background: #fff;
+    padding: 16px;
+}
+
+.login-empleado form {
+    max-width: 460px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.login-empleado input,
+.empleado-form input,
+.empleado-form select,
+.empleado-acciones input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cfd6dd;
+    border-radius: 6px;
+}
+
+.empleados-header {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.empleados-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.empleados-lista {
+    display: grid;
+    gap: 10px;
+}
+
+.empleado-card__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.empleado-card h3,
+.empleado-card p {
+    margin: 0;
+}
+
+.empleado-card small {
+    color: #66717d;
+}
+
+.empleado-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.empleado-acciones form {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.estado-empleado {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    border-radius: 999px;
+    padding: 4px 9px;
+    background: #eef2f6;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.estado-empleado.activo {
+    background: #e9f7ef;
+    color: #176334;
+}
+
+.estado-empleado.inactivo {
+    background: #fff1f0;
+    color: #9f1f16;
+}
+
+@media (max-width: 780px) {
+    .login-roles,
+    .empleados-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .empleados-header {
+        display: grid;
+    }
+}

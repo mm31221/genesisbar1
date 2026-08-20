@@ -9,6 +9,19 @@
     box-sizing:border-box;
 }
 
+.boton-secundario{
+    background:#6c757d;
+}
+
+.boton-peligro{
+    background:#b42318;
+}
+
+.form-inline{
+    display:inline-block;
+    margin:0;
+}
+
 body{
 
     font-family:Arial, Helvetica, sans-serif;
@@ -20,23 +33,26 @@ body{
 }
 
 /* ---------- HEADER ---------- */
-
 header{
-
-    background:#202020;
-
+    background-color:#202020;
+    background-image:linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)), url("/genesisbar1/assets/img/logo/genesis-logo.jpeg");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
     color:white;
-
-    padding:20px;
-
+    min-height:220px;
+    padding:35px 20px;
 }
 
 header h1{
-
     text-align:center;
-
 }
 
+.logo-header{
+    height:70px;
+    vertical-align:middle;
+    margin-right:10px;
+}
 /* ---------- MENU ---------- */
 
 nav{
@@ -159,23 +175,55 @@ footer{
     margin-top:30px;
 }
 
-.boton{
+.menu .boton{
+    display:grid;
+    justify-items:center;
+    align-content:center;
+    gap:10px;
+    min-height:150px;
     background:white;
     border-radius:12px;
     text-decoration:none;
     color:#222;
     text-align:center;
-    padding:35px;
-    font-size:24px;
+    padding:24px;
+    font-size:22px;
     font-weight:bold;
     box-shadow:0 4px 10px rgba(0,0,0,.15);
     transition:0.3s;
 }
 
-.boton:hover{
+.menu .boton:hover{
     background:#ff9800;
     color:white;
     transform:scale(1.03);
+}
+
+.menu-icon{
+    display:grid;
+    place-items:center;
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background:#202020;
+    color:#ff9800;
+    font-size:20px;
+    font-weight:900;
+    line-height:1;
+}
+
+.menu .boton:hover .menu-icon{
+    background:white;
+    color:#202020;
+}
+
+.menu .boton small{
+    color:#666;
+    font-size:14px;
+}
+
+.menu .boton:hover small{
+    color:white;
 }
 
 h2{
@@ -1265,4 +1313,574 @@ textarea{
 
 .boton-secundario-caja{
     background:#616161;
+}
+
+/* ===========================
+   PORTAL CLIENTES
+=========================== */
+
+.portal-clientes{
+    background:#f5f1ea;
+    color:#27221d;
+}
+
+.portal-navbar{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    padding:12px clamp(16px,4vw,48px);
+    background:#202020;
+    color:#fff;
+    border-bottom:4px solid #ff9800;
+    box-shadow:0 8px 22px rgba(0,0,0,.18);
+}
+
+.portal-brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:#fff;
+    text-decoration:none;
+}
+
+.portal-brand-mark{
+    display:grid;
+    place-items:center;
+    width:44px;
+    height:44px;
+    border-radius:8px;
+    background:#ff9800;
+    color:#202020;
+    font-weight:900;
+}
+
+.portal-brand strong,
+.portal-brand small{
+    display:block;
+}
+
+.portal-brand small{
+    margin-top:2px;
+    color:#f1c27a;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.portal-nav{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+    margin:0;
+    text-align:left;
+}
+
+.portal-nav a,
+.portal-productos-toggle{
+    display:inline-flex;
+    align-items:center;
+    min-height:40px;
+    padding:9px 12px;
+    color:#fff;
+    background:transparent;
+    border:0;
+    border-radius:6px;
+    text-decoration:none;
+    font:inherit;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.portal-nav a{
+    margin:0;
+}
+
+.portal-nav a:hover,
+.portal-productos-toggle:hover,
+.portal-productos-menu.abierto .portal-productos-toggle{
+    background:rgba(255,152,0,.16);
+    color:#ffb347;
+}
+
+.portal-nav-cta{
+    background:#ff9800 !important;
+    color:#202020 !important;
+}
+
+.portal-productos-menu{
+    position:relative;
+}
+
+.portal-productos-dropdown{
+    position:absolute;
+    top:calc(100% + 10px);
+    left:0;
+    z-index:1001;
+    display:none;
+    min-width:230px;
+    padding:8px;
+    background:#fff;
+    border:1px solid rgba(0,0,0,.08);
+    border-radius:8px;
+    box-shadow:0 16px 35px rgba(0,0,0,.22);
+}
+
+.portal-productos-menu.abierto .portal-productos-dropdown,
+.portal-productos-menu:hover .portal-productos-dropdown{
+    display:grid;
+    gap:4px;
+}
+
+.portal-productos-dropdown button{
+    width:100%;
+    padding:11px 12px;
+    color:#27221d;
+    background:#fff;
+    border:0;
+    border-radius:6px;
+    text-align:left;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.portal-productos-dropdown button:hover{
+    background:#fff3df;
+    color:#c46d00;
+}
+
+.portal-nav-toggle{
+    display:none;
+    width:44px;
+    height:44px;
+    border:1px solid rgba(255,255,255,.22);
+    border-radius:8px;
+    background:transparent;
+    cursor:pointer;
+}
+
+.portal-nav-toggle span{
+    display:block;
+    width:22px;
+    height:2px;
+    margin:5px auto;
+    background:#fff;
+    border-radius:999px;
+}
+
+.portal-main{
+    width:min(1180px,calc(100% - 32px));
+    margin:24px auto 44px;
+}
+
+.portal-hero{
+    display:grid;
+    grid-template-columns:minmax(0,1.45fr) minmax(280px,.75fr);
+    gap:24px;
+    align-items:stretch;
+    min-height:460px;
+    margin-bottom:24px;
+    padding:clamp(24px,5vw,52px);
+    overflow:hidden;
+    background:
+        linear-gradient(135deg, rgba(32,32,32,.94), rgba(51,38,25,.88)),
+        repeating-linear-gradient(45deg, rgba(255,152,0,.18) 0 1px, transparent 1px 16px);
+    border-radius:8px;
+    color:#fff;
+}
+
+.portal-hero-copy{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    max-width:760px;
+}
+
+.portal-eyebrow{
+    margin-bottom:14px;
+    color:#ffbd59;
+    font-weight:900;
+    text-transform:uppercase;
+    font-size:13px;
+    letter-spacing:0;
+}
+
+.portal-hero h1{
+    max-width:760px;
+    margin:0 0 16px;
+    font-size:clamp(34px,5vw,62px);
+    line-height:1.02;
+}
+
+.portal-hero p{
+    max-width:620px;
+    color:#f7ead9;
+    font-size:18px;
+    line-height:1.55;
+}
+
+.portal-acciones{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:8px;
+}
+
+.portal-boton-principal,
+.portal-boton-secundario{
+    min-height:46px;
+    padding:12px 18px;
+    border-radius:6px;
+    font-size:16px;
+    font-weight:900;
+    text-decoration:none;
+}
+
+.portal-boton-principal{
+    background:#ff9800 !important;
+    color:#202020 !important;
+    box-shadow:none;
+}
+
+.portal-boton-principal:hover{
+    background:#ffb347 !important;
+    color:#202020 !important;
+    transform:none;
+}
+
+.portal-boton-secundario{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.36);
+}
+
+.portal-boton-secundario:hover{
+    background:rgba(255,255,255,.1);
+}
+
+.portal-hero-card{
+    align-self:center;
+    padding:22px;
+    background:#fff;
+    color:#27221d;
+    border-radius:8px;
+    box-shadow:0 18px 40px rgba(0,0,0,.22);
+}
+
+.portal-hero-card strong{
+    display:block;
+    font-size:32px;
+    margin-bottom:4px;
+}
+
+.portal-hero-card span{
+    display:block;
+    color:#c46d00;
+    font-weight:900;
+    margin-bottom:14px;
+}
+
+.portal-hero-card ul{
+    margin:0;
+    padding:0;
+    list-style:none;
+}
+
+.portal-hero-card li{
+    padding:11px 0;
+    border-top:1px solid #eee2d2;
+    font-weight:bold;
+}
+
+.estado-cliente-panel,
+.portal-grid,
+.categoria-acordeon,
+.carrito-cliente-panel{
+    scroll-margin-top:98px;
+}
+
+.portal-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1.6fr) minmax(300px,.8fr);
+    gap:22px;
+    align-items:start;
+}
+
+.menu-acordeon{
+    display:grid;
+    gap:12px;
+}
+
+.categoria-acordeon{
+    border:1px solid #eadac3;
+    border-radius:8px;
+    background:#fff;
+    overflow:hidden;
+}
+
+.categoria-acordeon summary{
+    padding:16px 18px;
+    background:#202020;
+    color:#fff;
+    font-size:18px;
+    font-weight:900;
+    cursor:pointer;
+}
+
+.categoria-acordeon[open] summary{
+    background:#ff9800;
+    color:#202020;
+}
+
+.productos-grid-cliente{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+    gap:14px;
+    padding:16px;
+}
+
+.producto-cliente{
+    display:grid;
+    grid-template-columns:48px minmax(0,1fr);
+    gap:12px;
+    padding:15px;
+    border:1px solid #eee2d2;
+    border-radius:8px;
+    background:#fffaf2;
+}
+
+.producto-cliente h4{
+    margin-bottom:6px;
+}
+
+.producto-cliente p{
+    margin-bottom:10px;
+    color:#675b4e;
+}
+
+.producto-cliente .boton-agregar{
+    grid-column:1/-1;
+}
+
+.producto-inicial{
+    display:grid;
+    place-items:center;
+    width:48px;
+    height:48px;
+    border-radius:8px;
+    background:#202020;
+    color:#ffb347;
+    font-size:22px;
+    font-weight:900;
+}
+
+.portal-carrito-titulo{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:14px;
+}
+
+.portal-carrito-titulo strong{
+    color:#c46d00;
+    font-size:24px;
+}
+
+.carrito-cliente-panel{
+    position:sticky;
+    top:96px;
+}
+
+.carrito-cliente-panel label{
+    display:block;
+    margin:14px 0 7px;
+    font-weight:bold;
+}
+
+.carrito-cliente-panel select,
+.carrito-cliente-panel input{
+    width:100%;
+}
+
+#confirmarPedidoCliente{
+    width:100%;
+    margin-top:16px;
+    border:0;
+    background:#28a745;
+    color:#fff;
+    cursor:pointer;
+}
+
+#confirmarPedidoCliente:disabled{
+    background:#9c9c9c;
+    cursor:not-allowed;
+}
+
+.carrito-cliente-vacio{
+    padding:14px;
+    background:#f7f4ef;
+    border-radius:8px;
+    color:#675b4e;
+    font-weight:bold;
+}
+
+@media(max-width:900px){
+    .portal-nav-toggle{
+        display:block;
+        flex:0 0 auto;
+    }
+
+    .portal-nav{
+        position:absolute;
+        top:100%;
+        right:0;
+        left:0;
+        display:none;
+        flex-direction:column;
+        align-items:stretch;
+        gap:4px;
+        padding:12px 16px 16px;
+        background:#202020;
+        border-bottom:4px solid #ff9800;
+        box-shadow:0 16px 24px rgba(0,0,0,.2);
+    }
+
+    .portal-nav.abierto{
+        display:flex;
+    }
+
+    .portal-nav a,
+    .portal-productos-toggle{
+        width:100%;
+        justify-content:flex-start;
+    }
+
+    .portal-productos-dropdown{
+        position:static;
+        min-width:0;
+        margin:2px 0 6px;
+        box-shadow:none;
+        border:0;
+        background:#2a2a2a;
+    }
+
+    .portal-productos-menu:hover .portal-productos-dropdown{
+        display:none;
+    }
+
+    .portal-productos-menu.abierto .portal-productos-dropdown{
+        display:grid;
+    }
+
+    .portal-productos-dropdown button{
+        color:#fff;
+        background:#2a2a2a;
+    }
+
+    .portal-productos-dropdown button:hover{
+        background:rgba(255,152,0,.16);
+        color:#ffb347;
+    }
+
+    .portal-hero{
+        grid-template-columns:1fr;
+        min-height:0;
+    }
+
+    .portal-grid{
+        grid-template-columns:1fr;
+    }
+
+    .carrito-cliente-panel{
+        position:static;
+    }
+}
+
+@media(max-width:560px){
+    .portal-navbar{
+        padding:10px 12px;
+    }
+
+    .portal-brand small{
+        display:none;
+    }
+
+    .portal-main{
+        width:calc(100% - 20px);
+        margin-top:14px;
+    }
+
+    .portal-hero{
+        padding:22px;
+    }
+
+    .portal-hero h1{
+        font-size:34px;
+    }
+
+    .portal-acciones,
+    .portal-boton-principal,
+    .portal-boton-secundario{
+        width:100%;
+    }
+
+    .productos-grid-cliente{
+        grid-template-columns:1fr;
+        padding:12px;
+    }
+}
+
+.portal-auth-main{
+    width:min(760px,calc(100% - 32px));
+    margin:34px auto;
+}
+
+.portal-auth-panel{
+    padding:clamp(22px,4vw,34px);
+}
+
+.portal-auth-panel-amplio{
+    width:min(920px,100%);
+    margin:auto;
+}
+
+.portal-auth-panel h1{
+    margin:0 0 10px;
+    font-size:34px;
+}
+
+.portal-auth-panel label{
+    display:block;
+    margin:14px 0 7px;
+    font-weight:bold;
+}
+
+.portal-auth-panel .boton{
+    width:100%;
+    margin-top:18px;
+    border:0;
+}
+
+.portal-nav-simple{
+    display:flex;
+}
+
+.portal-perfil-datos{
+    display:grid;
+    gap:10px;
+    margin-top:18px;
+}
+
+.portal-perfil-datos p{
+    margin:0;
+    padding:12px;
+    background:#f7f4ef;
+    border-radius:8px;
 }
